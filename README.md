@@ -107,6 +107,8 @@ http server started on port xxxxx
 ## 编写测试
 
 ```java
+import org.junit.jupiter.api.Test;
+
 @BeantapInit
 public class BeantapTest {
 
@@ -124,6 +126,7 @@ public class BeantapTest {
 
 - `@BeantapInit`：标在测试类上，开启本工具的字段注入。无需 `@ExtendWith`、无需 `@SpringBootTest`，测试本身不启动 Spring 容器。
 - `@TestBeantap`：标在字段上，接口或具体类均可。
+- `@Test`：@Test注解需要使用`import org.junit.jupiter.api.Test;`包下的，否则会不生效。
 
 ## bean 定位规则（`name` 属性）
 
