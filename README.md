@@ -127,6 +127,7 @@ public class BeantapTest {
 - `@BeantapInit`：标在测试类上，开启本工具的字段注入。无需 `@ExtendWith`、无需 `@SpringBootTest`，测试本身不启动 Spring 容器。
 - `@TestBeantap`：标在字段上，接口或具体类均可。
 - `@Test`：@Test注解需要使用`import org.junit.jupiter.api.Test;`包下的，否则会不生效。
+- Beantap的测试类，必须放在配置了 spring.application.name 的模块下（即包含 application.yml / application.properties 工程下）。
 
 ## bean 定位规则（`name` 属性）
 

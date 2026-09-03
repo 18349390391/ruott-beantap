@@ -38,9 +38,10 @@ public class VertHttpClient {
             invoke = method.invoke(bean, args);
             response.setCode(200);
             response.setData(invoke);
-
-            Class<?> aClass = invoke.getClass();
-            response.setDataType(aClass);
+            if (invoke != null) {
+                Class<?> aClass = invoke.getClass();
+                response.setDataType(aClass);
+            }
             response.setMessage("success");
         } catch (Exception e) {
             response.setCode(500);
