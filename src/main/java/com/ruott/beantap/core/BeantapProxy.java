@@ -1,6 +1,7 @@
 package com.ruott.beantap.core;
 
 import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.ruott.beantap.constant.UriConstant;
 import com.ruott.beantap.exception.BeanTapIllegalStateException;
 import com.ruott.beantap.exception.BeanTapRunTimeException;
@@ -19,6 +20,10 @@ public class BeantapProxy {
     private final static Logger logger = Logger.getLogger(BeantapProxy.class.getName());
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
+    static {
+        OBJECT_MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    }
 
     public static Object invoke(Method method, Object[] args, String beanName) throws Exception {
         int port = VertxTmpdirPort.getInstance().read();
