@@ -44,9 +44,11 @@ public class VertHttpClient {
             }
             response.setMessage("success");
         } catch (Exception e) {
+            Throwable cause = e instanceof InvocationTargetException ? ((InvocationTargetException) e).getTargetException() : e;
+            log.error("Beantap invoke error", cause);
             response.setCode(500);
-            response.setMessage(e.getMessage());
-            response.setException(e);
+            response.setMessage(cause.toString());
+            response.setException(cause instanceof Exception ? (Exception) cause : e);
         }
         return JSON.toJSONString(response);
     }
