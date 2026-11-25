@@ -5,13 +5,18 @@ import com.alibaba.fastjson.JSON;
 import com.ruott.beantap.exception.BeanTapIllegalStateException;
 import com.ruott.beantap.model.BeantapRequest;
 import com.ruott.beantap.model.BeantapResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.NoUniqueBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 
+
+@Slf4j
 public class VertHttpClient {
 
     private final ApplicationContext context;
@@ -29,8 +34,9 @@ public class VertHttpClient {
         Method method = targetClazz.getMethod(request.getMethodName(), request.getParameterTypes());
         method.setAccessible(true);
 
-        // 遍历参数数组，进行类型转换 防止JSON转换时类型擦除问题
-        Object[] args = this.convertArgs(request.getArgs(), request.getParameterTypes());
+        // 遍历参数数组，按泛型类型转换 防止JSON转换时类型擦除问题（如 List<RpaTaskReportReq> 元素残留 JSONObject）
+        Object[] args = this.convertArgs(request.getArgs(), method.getGenericParameterTypes());
+
 
         BeantapResponse response = new BeantapResponse();
         Object invoke = null;
@@ -53,7 +59,7 @@ public class VertHttpClient {
         return JSON.toJSONString(response);
     }
 
-    private Object[] convertArgs(Object[] rawArgs, Class<?>[] paramTypes) {
+    private Object[] convertArgs(Object[] rawArgs, Type[] paramTypes) {
         if (rawArgs == null || rawArgs.length == 0) {
             return rawArgs;
         }
@@ -62,7 +68,8 @@ public class VertHttpClient {
             Object arg = rawArgs[i];
             if (arg == null) {
                 converted[i] = null;
-            } else if (paramTypes[i].isInstance(arg)) {
+            } else if (paramTypes[i] instanceof Class && ((Class<?>) paramTypes[i]).isInstance(arg)) {
+                // 普通类型直接复用；泛型容器(List<T>/Map<K,V>)不能仅凭原始类型判断，需按下述分支按泛型转换元素
                 converted[i] = arg;
             } else {
                 converted[i] = JSON.parseObject(JSON.toJSONString(arg), paramTypes[i]);
